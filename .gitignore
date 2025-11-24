@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Backend-specific
+server/node_modules/
+server/.env
+server/dist/
+server/build/
+
+# Frontend-specific (extra safety)
+client/node_modules/
+client/dist/
+client/build/
+client/.env
+
+# General
+.env
+.env.local
