@@ -15,6 +15,7 @@ An intelligent ATS that automatically parses resumes, extracts skills, ranks can
   - Token generation utility added
 - Authorization middleware added to protect private routes
 - API structure organized with modular routes, controllers, and middleware
+- Frontend authentication implemented with React, Formik, and Yup (register and login flows connected to backend API)
 - Daily commits → new progress every day!
 
 ### Next Steps
