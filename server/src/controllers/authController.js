@@ -14,11 +14,21 @@ export const register = async (req, res) => {
             return res.status(400).json({ message: "Invalid email address" })
         }
 
+        
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/;
+        if (!passwordRegex.test(password)) {
+            return res.status(400).json({
+                message: "Password must contain uppercase, lowercase, number, and special character"
+            });
+        }
+        if (password.length < 8) {
+            return res.status(400).json({ message: "Password must be at least 8 characters long" });
+        }
+        
         const existing = await User.findOne({ email })
         if (existing) {
             return res.status(400).json({ message: "Email already registered" })
         }
-
         const salt = await bcrypt.genSalt(10)
         const hashed = await bcrypt.hash(password, salt)
 

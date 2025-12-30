@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useAuth } from '../context/AuthContext.jsx'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as yup from 'yup'
 
@@ -10,6 +10,7 @@ const loginSchema = yup.object().shape({
     password: yup.string().required("Password is required")
 })
 const Login = () => {
+    const {login} = useAuth()
     const navigate = useNavigate()
     const [serverError, setserverError] = useState("")
     const [successMsg, setsuccessMsg] = useState("")
@@ -23,31 +24,16 @@ const Login = () => {
         setserverError("")
         setsuccessMsg("")
 
-        try {
-            const response = await axios.post("http://localhost:5005/api/auth/login", values)
+        const result = await login(values.email, values.password)
 
-            localStorage.setItem("token", response.data.token)
-            localStorage.setItem("user", JSON.stringify(response.data.user))
-
-            if (response.status === 200 || response.status === 201) {
-                setsuccessMsg("Login successful! Redirecting...")
-                resetForm()
-                setTimeout(() => {
-                    navigate("/dashboard")
-                }, 1500);
-                setSubmitting(false)
-            } else {
-                setserverError("Login failed. Please try again.")
-            }
-        } catch (error) {
-            console.error(error, error.message, error.response, error.request)
-            setSubmitting(false)
-            if (error.response?.data?.message) {
-                setserverError(error.response.data.message)
-            } else {
-                setserverError("An error occurred. Please try again later.")
-            }
+        if (result.success){
+            setsuccessMsg('Login successful! Redirecting...')
+            resetForm()
+        }else{
+            setserverError(result.error)
         }
+
+        setSubmitting(false)
     }
     return (
         <div className='container mt-5'>

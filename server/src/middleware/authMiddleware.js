@@ -8,7 +8,7 @@ export const protect = async (req, res, next)=>{
         try {
             token = req.headers.authorization.split(" ")[1]
             const decode = jwt.verify(token, process.env.JWT_SECRET)
-            req.user = await User.findById(decoded.id).select("-password")
+            req.user = await User.findById(decode.id).select("-password")
             return next()
         } catch (error) {
             console.log("Authentication middleware error:", error);

@@ -1,5 +1,5 @@
 import React from 'react'
-import axios from 'axios'
+import { useAuth } from '../context/AuthContext.jsx'
 import { Formik, Form, Field, ErrorMessage } from 'formik'
 import * as yup from 'yup'
 import { useNavigate } from 'react-router-dom'
@@ -12,6 +12,7 @@ const registerSchema = yup.object().shape({
     role: yup.string().oneOf(['candidate', 'employer', 'admin'], "Invalid role").required("Role is required"),
 })
 const Register = () => {
+    const {register} = useAuth()
     const navigate = useNavigate();
     const [serverError, setserverError] = useState("")
     const [successMsg, setsuccessMsg] = useState("")
@@ -27,31 +28,16 @@ const Register = () => {
         setserverError("");
         setsuccessMsg("");
 
-        try {
-            const response = await axios.post("http://localhost:5005/api/auth/register", values)
-            // console.log(response, response.data, response.status);
-
-            if (response.status === 200 || response.status === 201){
-                setsuccessMsg("Registration successful! Redirecting to login...");
-                resetForm();
-                setTimeout(() => {
-                    navigate("/login")
-                }, 1500);
-                setSubmitting(false);
-            }else {
-                setserverError("Registration failed. Please try again")
-            }
-        } catch (error) {
-            console.error(error, error.message, error.response, error.request)
-            setSubmitting(false);
-            if (error.response?.data?.message){
-                setserverError(error.response.data.message)
-                // console.log(error.response.data.message);
-                
-            }else {
-                setserverError("An error occurred. Please try again later.")
-            }
+        const result = await register(values.fullname, values.email, values.password, values.role)
+        
+        if(result.success){
+            setsuccessMsg('Registration successful! Redirecting...')
+            resetForm()
+        }else{
+            setserverError(result.error)
         }
+
+        setSubmitting(false)
     }
     return (
         <div className='container mt-5'>
@@ -98,6 +84,16 @@ const Register = () => {
                             </Form>
                         )}
                     </Formik>
+
+            <p style={{ marginTop: "10px" }}>
+                Already have an account?{" "}
+                <span
+                    style={{ color: "blue", cursor: "pointer" }}
+                    onClick={() => navigate("/login")}
+                >
+                    Login
+                </span>
+            </p>
         </div>
     )
 }
